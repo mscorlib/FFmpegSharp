@@ -24,7 +24,7 @@ namespace FFmpegSharp.Filters
 
         public override string ToString()
         {
-            return string.Concat(" -r", Rate);
+            return string.Concat(" -r ", Rate);
         }
     }
 }

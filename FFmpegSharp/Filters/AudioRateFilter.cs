@@ -19,16 +19,12 @@ namespace FFmpegSharp.Filters
             Name = "AudioRate";
             FilterType = FilterType.Audio;
             Rate = rate;
-
             Rank = 8;
         }
 
         public override string ToString()
         {
-            if(Rate > Source.AudioInfo.Channels)
-                throw new ApplicationException(string.Format("there only {0} channels in audio stream.", Source.AudioInfo.Channels));
-
-            return string.Concat(" - ar", Rate);
+            return string.Concat(" -ar ", Rate);
         }
     }
 }

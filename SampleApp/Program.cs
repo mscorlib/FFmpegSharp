@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using FFmpegSharp.Codes;
 using FFmpegSharp.Executor;
@@ -18,19 +20,24 @@ namespace SampleApp
             if (string.IsNullOrWhiteSpace(appPath))
                 throw new ApplicationException("app path not found.");
 
-            var inputPath = Path.Combine(appPath, "test.mov");
+            var inputPath = Path.Combine(appPath, "bbt.mkv");
             var outputPath = Path.Combine(appPath, Guid.NewGuid().ToString());
 
-            Console.WriteLine("start encoding...");
+            Console.WriteLine("start...");
 
-            Encoder.Create()
-                .WidthInput(inputPath)
-                .WithFilter(new X264Filter { Preset = X264Preset.Faster, ConstantQuantizer = 18 })
-                .WithFilter(new ResizeFilter(980, 550))
-                .To<Mp4>(outputPath)
-                .Execute();
+            //Encoder.Create()
+            //    .WidthInput(inputPath)
+            //    .WithFilter(new X264Filter { Preset = X264Preset.Faster, ConstantQuantizer = 18 })
+            //    .WithFilter(new ResizeFilter(980, 550))
+            //    .To<Mp4>(outputPath)
+            //    .Execute();
 
-            //after execute completed,will create a mp4 file in '/bin/debug'.
+            Network.Create()
+                .WithSource(inputPath)
+                .WithDest("rtmp://192.168.10.12/live/stream")
+                .WithFilter(new X264Filter{ConstantQuantizer = 20})
+                .WithFilter(new ResizeFilter(980,500))
+                .Push();
 
             Console.WriteLine("done.\npress any key to exit.");
 

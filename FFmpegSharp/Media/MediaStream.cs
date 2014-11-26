@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using FFmpegSharp.Executor;
 using Newtonsoft.Json.Linq;
 
@@ -16,9 +18,31 @@ namespace FFmpegSharp.Media
                 throw new ApplicationException(string.Format("file not found in the path: {0} .", path));
             }
 
-            var infostr = GetStreamInfo(path);
+            List<StreamInfo> streams = null;
 
-            var streams = JObject.Parse(infostr).SelectToken("streams", false).ToObject<List<StreamInfo>>();
+
+            //try 10 times
+            var i = 0;
+            do
+            {
+                try
+                {
+                    var infostr = GetStreamInfo(path);
+                    streams = JObject.Parse(infostr).SelectToken("streams", false).ToObject<List<StreamInfo>>();
+                    i = 10;
+                }
+                catch (Exception)
+                {
+                    i += 1;
+                }
+                
+            } while (i < 10);
+
+
+            if (null == streams)
+            {
+                throw new ApplicationException("no stream found in the source.");
+            }
 
             var videoStream = streams.FirstOrDefault(x => x.Type.Equals("video"));
 
@@ -50,12 +74,32 @@ namespace FFmpegSharp.Media
         public VideoInfo VideoInfo { get; private set; }
         public AudioInfo AudioInfo { get; private set; }
 
-        private string GetStreamInfo(string path)
+        private static string GetStreamInfo(string path)
         {
             const string paramStr = " -v quiet -print_format json -hide_banner -show_format -show_streams -pretty {0}";
             var @param = string.Format(paramStr, path);
 
-            var message =  Processor.FFprobe(@param);
+            var message = Processor.FFprobe(@param,
+                id => Task.Run(async () =>
+                {
+                    await Task.Delay(1000);
+
+                    /*
+                     * if rtmp is alive but no current stream output, 
+                     * FFmpeg will  be in a wait state forerver.
+                     * so after 1s, kill the process.
+                     */
+
+                    try
+                    {
+                        var p = Process.GetProcessById(id);//when the process was exited will throw a excetion. 
+                        p.Kill();
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                }));
 
             if (message.Equals("error", StringComparison.OrdinalIgnoreCase))
             {

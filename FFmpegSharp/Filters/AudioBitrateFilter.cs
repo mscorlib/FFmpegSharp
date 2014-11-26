@@ -30,7 +30,7 @@ namespace FFmpegSharp.Filters
             if (Rate < 64)
                 Rate = 64;
 
-            return string.Format(" - b:a {0}k", Rate);
+            return string.Format(" -b:a {0}k", Rate);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace FFmpegSharp.Filters
 
         public override string ToString()
         {
-            return string.Concat(" -b:v", Bitrate);
+            return string.Concat(" -b:v ", Bitrate);
         }
     }
 }

@@ -1,12 +1,6 @@
-FFmpegSharp is a fluent api encapsulation of ffmpeg with C#
+### FFmpegSharp is a fluent api encapsulation of ffmpeg with C#
 
-======
-
-sample:
-
-======
-
-
+## Encode media
 ```csharp
 var currentDir =
 new FileInfo(Uri.UnescapeDataString(new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath));
@@ -21,15 +15,27 @@ var inputPath = Path.Combine(appPath, "test.mov");
 var outputPath = Path.Combine(appPath, Guid.NewGuid().ToString());
 
 Encoder.Create()
-.WidthInput(inputPath)
-.WithFilter(new X264Filter {Preset = X264Preset.Faster, ConstantQuantizer = 18})
-.WithFilter(new ResizeFilter(980, 550))
-.To<Mp4>(outputPath)
-.Execute();
+	.WidthInput(inputPath)
+	.WithFilter(new X264Filter {Preset = X264Preset.Faster, ConstantQuantizer = 18})
+	.WithFilter(new ResizeFilter(980, 550))
+	.To<Mp4>(outputPath)
+	.Execute();
 
 ```
 
-======
+
+## Push a file to RTMP Server
+```csharp
+Network.Create()
+	.WithSource(inputPath)
+	.WithDest("rtmp://192.168.10.12/live/stream")
+	.WithFilter(new X264Filter{ConstantQuantizer = 20})
+	.WithFilter(new ResizeFilter(980,500))
+	.Push();
+```
+
+
+### FFmpegLib
 if you want build this project,
 please donwload ffmpeg lib first.
 

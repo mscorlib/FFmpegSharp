@@ -23,7 +23,7 @@ namespace FFmpegSharp.Filters
             if(Channel > Source.AudioInfo.Channels)
                 throw new ApplicationException(string.Format("there only {0} channels in audio stream.", Source.AudioInfo.Channels));
 
-            return string.Concat(" - ac", Channel);
+            return string.Concat(" -ac ", Channel);
         }
     }
 }
