@@ -6,6 +6,8 @@ sample:
 
 ======
 
+
+```csharp
 var currentDir =
 new FileInfo(Uri.UnescapeDataString(new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath));
 
@@ -21,10 +23,11 @@ var outputPath = Path.Combine(appPath, Guid.NewGuid().ToString());
 Encoder.Create()
 .WidthInput(inputPath)
 .WithFilter(new X264Filter {Preset = X264Preset.Faster, ConstantQuantizer = 18})
+.WithFilter(new ResizeFilter(980, 550))
 .To<Mp4>(outputPath)
 .Execute();
 
-
+```
 
 ======
 if you want build this project,
