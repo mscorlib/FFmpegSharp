@@ -3,10 +3,7 @@
  * https://trac.ffmpeg.org/wiki/Encode/H.264
  * http://mewiki.project357.com/wiki/X264_Settings
  */
- 
-using System;
 using System.Text;
-using FFmpegSharp.Media;
 
 namespace FFmpegSharp.Filters
 {

@@ -18,9 +18,6 @@ namespace FFmpegSharp.Media
                 throw new ApplicationException(string.Format("file not found in the path: {0} .", path));
             }
 
-            List<StreamInfo> streams = null;
-
-
             //try 10 times
             var i = 0;
             do
@@ -28,7 +25,8 @@ namespace FFmpegSharp.Media
                 try
                 {
                     var infostr = GetStreamInfo(path);
-                    streams = JObject.Parse(infostr).SelectToken("streams", false).ToObject<List<StreamInfo>>();
+                    LoadInfo(infostr);
+
                     i = 10;
                 }
                 catch (Exception)
@@ -37,42 +35,14 @@ namespace FFmpegSharp.Media
                 }
                 
             } while (i < 10);
-
-
-            if (null == streams)
-            {
-                throw new ApplicationException("no stream found in the source.");
-            }
-
-            var videoStream = streams.FirstOrDefault(x => x.Type.Equals("video"));
-
-            if (null != videoStream)
-            {
-                VideoInfo = new VideoInfo
-                {
-                    CodecName =  videoStream.CodecName,
-                    Height = videoStream.Height,
-                    Width = videoStream.Width,
-                    Duration = videoStream.Duration
-                };
-            }
-
-            var audioStream = streams.FirstOrDefault(x => x.Type.Equals("audio"));
-
-            if (null != audioStream)
-            {
-                AudioInfo = new AudioInfo
-                {
-                    CodecName = audioStream.CodecName,
-                    Channels = audioStream.Channels,
-                    Duration = audioStream.Duration,
-                };
-            }
+            
+            FilePath = path;
 
         }
 
         public VideoInfo VideoInfo { get; private set; }
         public AudioInfo AudioInfo { get; private set; }
+        public string FilePath { get; set; }
 
         private static string GetStreamInfo(string path)
         {
@@ -107,6 +77,53 @@ namespace FFmpegSharp.Media
             }
 
             return message;
+        }
+
+        private void LoadInfo(string infostr)
+        {
+            var streams = JObject.Parse(infostr).SelectToken("streams", false).ToObject<List<StreamInfo>>();
+            var mediaInfo = JObject.Parse(infostr).SelectToken("format").ToObject<StreamInfo>();
+
+            if (null == streams)
+            {
+                throw new ApplicationException("no stream found in the source.");
+            }
+
+            var videoStream = streams.FirstOrDefault(x => x.Type.Equals("video"));
+
+            if (null != videoStream)
+            {
+                VideoInfo = new VideoInfo
+                {
+                    CodecName = videoStream.CodecName,
+                    Height = videoStream.Height,
+                    Width = videoStream.Width,
+                    Duration = videoStream.Duration
+                };
+
+                if (VideoInfo.Duration.Ticks < 1)
+                {
+                    VideoInfo.Duration = mediaInfo.Duration;
+                }
+            }
+
+            var audioStream = streams.FirstOrDefault(x => x.Type.Equals("audio"));
+
+            if (null != audioStream)
+            {
+                AudioInfo = new AudioInfo
+                {
+                    CodecName = audioStream.CodecName,
+                    Channels = audioStream.Channels,
+                    Duration = audioStream.Duration,
+                };
+
+                if (AudioInfo.Duration.Ticks < 1)
+                {
+                    AudioInfo.Duration = mediaInfo.Duration;
+                }
+            }
+
         }
     }
 }

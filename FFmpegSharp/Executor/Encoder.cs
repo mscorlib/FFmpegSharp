@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using FFmpegSharp.Codes;
 using FFmpegSharp.Filters;
 using FFmpegSharp.Media;
@@ -33,6 +34,12 @@ namespace FFmpegSharp.Executor
 
         public Encoder WithFilter(FilterBase filter)
         {
+            if (_filters.Any(x=>x.Name.Equals(filter.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                var old = _filters.First(x => x.Name.Equals(filter.Name, StringComparison.OrdinalIgnoreCase));
+                _filters.Remove(old);
+            }
+
             _filters.Add(filter);
             return this;
         }
@@ -67,6 +74,20 @@ namespace FFmpegSharp.Executor
             if (!string.IsNullOrWhiteSpace(outdir) && !Directory.Exists(outdir))
             {
                 Directory.CreateDirectory(outdir);
+            }
+
+
+            if (_filters.Any(x => x.Name.Equals("Snapshot", StringComparison.OrdinalIgnoreCase)))
+            {
+                var snapshot = _filters.First(x => x.Name.Equals("Snapshot", StringComparison.OrdinalIgnoreCase));
+                snapshot.Source = _source;
+
+                _filters.Remove(snapshot);
+                
+                Task.Run(() =>
+                {
+                    Processor.FFmpeg(snapshot.ToString());
+                });
             }
 
             var builder = new StringBuilder();

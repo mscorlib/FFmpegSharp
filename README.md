@@ -1,6 +1,6 @@
 ### FFmpegSharp is a fluent api encapsulation of ffmpeg with C#
 
-## Encode media
+## Encode media(with snapshot)
 ```csharp
 var currentDir =
 new FileInfo(Uri.UnescapeDataString(new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath));
@@ -17,6 +17,7 @@ var outputPath = Path.Combine(appPath, Guid.NewGuid().ToString());
 Encoder.Create()
 	.WidthInput(inputPath)
 	.WithFilter(new X264Filter {Preset = X264Preset.Faster, ConstantQuantizer = 18})
+	.WithFilter(new SnapshotFilter(Path.Combine(appPath,"output","output.png"),320,180,10))//with snapshot
 	.WithFilter(new ResizeFilter(980, 550))
 	.To<Mp4>(outputPath)
 	.Execute();
@@ -30,7 +31,7 @@ Network.Create()
 	.WithSource(inputPath)
 	.WithDest("rtmp://192.168.10.12/live/stream")
 	.WithFilter(new X264Filter{ConstantQuantizer = 20})
-	.WithFilter(new ResizeFilter(980,500))
+	.WithFilter(new ResizeFilter(980,550))
 	.Push();
 ```
 

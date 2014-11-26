@@ -29,6 +29,12 @@ namespace FFmpegSharp.Executor
 
         public Network WithFilter(FilterBase filter)
         {
+            if (_filters.Any(x => x.Name.Equals(filter.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                var old = _filters.First(x => x.Name.Equals(filter.Name, StringComparison.OrdinalIgnoreCase));
+                _filters.Remove(old);
+            }
+
             _filters.Add(filter);
             return this;
         }

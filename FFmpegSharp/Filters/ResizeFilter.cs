@@ -1,18 +1,8 @@
 ﻿using System.Drawing;
-using FFmpegSharp.Media;
 using FFmpegSharp.Utils;
 
 namespace FFmpegSharp.Filters
 {
-    public enum ResizeType
-    {
-        Fixed,
-        /// <summary>
-        /// default value.
-        /// </summary>
-        Scale
-    }
-
     /// <summary>
     /// video resize filter
     /// </summary>

@@ -1,16 +1,9 @@
-﻿using System;
-using FFmpegSharp.Media;
-
-namespace FFmpegSharp.Filters
+﻿namespace FFmpegSharp.Filters
 {
     public class SegmentFilter : FilterBase
     {
         public int SegmentTime { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="segmentTime"></param>
         public SegmentFilter(int segmentTime)
         {
             Name = "Segment";

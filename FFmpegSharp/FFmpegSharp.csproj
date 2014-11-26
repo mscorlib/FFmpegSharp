@@ -68,11 +68,13 @@
     <Compile Include="Filters\FilterType.cs" />
     <Compile Include="Filters\IFilter.cs" />
     <Compile Include="Filters\ResizeFilter.cs" />
+    <Compile Include="Filters\ResizeType.cs" />
     <Compile Include="Filters\VideoBitrateFilter.cs" />
     <Compile Include="Filters\VideoRateFilter.cs" />
     <Compile Include="Filters\X264Filter.cs" />
     <Compile Include="Filters\X264Preset .cs" />
     <Compile Include="Filters\SegmentFilter.cs" />
+    <Compile Include="Filters\SnapshotFilter.cs" />
     <Compile Include="Media\AudioInfo.cs" />
     <Compile Include="Media\MediaStream.cs" />
     <Compile Include="Media\StreamInfo.cs" />

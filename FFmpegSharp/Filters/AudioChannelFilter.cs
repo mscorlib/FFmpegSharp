@@ -1,5 +1,4 @@
 ﻿using System;
-using FFmpegSharp.Media;
 
 namespace FFmpegSharp.Filters
 {

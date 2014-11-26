@@ -1,7 +1,4 @@
-﻿using System;
-using FFmpegSharp.Media;
-
-namespace FFmpegSharp.Filters
+﻿namespace FFmpegSharp.Filters
 {
     /// <summary>
     /// audio channel select filter
