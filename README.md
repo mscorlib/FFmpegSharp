@@ -40,3 +40,8 @@ for x64 build withd:
 http://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-20141117-git-3f07dd6-win64-shared.7z
 
 after extract the files, copy the contents of the 'bin' folder to the path '/external/ffmpeg/x32(or x64)/'
+
+
+## License
+
+[MIT](https://github.com/at0717/FFmpegSharp/blob/master/LICENSE)
