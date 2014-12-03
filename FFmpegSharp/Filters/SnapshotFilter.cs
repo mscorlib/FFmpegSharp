@@ -128,7 +128,6 @@ namespace FFmpegSharp.Filters
                 builder.AppendFormat(" -vf fps=fps=1/{0} {1}\\{2}%d{3}", Math.Floor(num), dir, filename, ext);
             }
 
-
             return builder.ToString();
         }
     }

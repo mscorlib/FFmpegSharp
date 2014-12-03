@@ -23,12 +23,14 @@ namespace SampleApp
 
             var inputPath = Path.Combine(appPath, "test.mov");
             var outputPath = Path.Combine(appPath, Guid.NewGuid().ToString());
+            var image = Path.Combine(appPath, "logo.png");
 
             Console.WriteLine("start...");
 
             Encoder.Create()
                 .WidthInput(inputPath)
                 .WithFilter(new X264Filter { Preset = X264Preset.Faster, ConstantQuantizer = 18 })
+                .WithFilter(new ImageWatermarkFilter(image, WatermarkPosition.TopRight))
                 .WithFilter(new ResizeFilter(980, 550))
                 .WithFilter(new SnapshotFilter(Path.Combine(appPath,"output","output.png"),320,180,10))//with snapshot
                 .To<Mp4>(outputPath)

@@ -1,8 +1,5 @@
 ﻿namespace FFmpegSharp.Filters
 {
-    /// <summary>
-    /// audio channel select filter
-    /// </summary>
     public class VideoBitrateFilter : FilterBase
     {
         public float Bitrate { get; private set; }
