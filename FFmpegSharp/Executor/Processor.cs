@@ -48,7 +48,19 @@ namespace FFmpegSharp.Executor
                         onStart.Invoke(p.Id);
                     }
 
-                    var message = userFFmpeg ? p.StandardError.ReadToEnd() : p.StandardOutput.ReadToEnd();
+                    var message = string.Empty;
+
+                    if (userFFmpeg)
+                    {
+                        while (!p.StandardError.EndOfStream)
+                        {
+                            message =p.StandardError.ReadLine();
+                        }
+                    }
+                    else
+                    {
+                        message = p.StandardOutput.ReadToEnd();
+                    }
 
                     p.WaitForExit();
 

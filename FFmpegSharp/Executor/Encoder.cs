@@ -29,6 +29,7 @@ namespace FFmpegSharp.Executor
         public Encoder WidthInput(string filePath)
         {
             _inputPath = filePath;
+            _source = new MediaStream(_inputPath);
             return this;
         }
 
@@ -58,38 +59,20 @@ namespace FFmpegSharp.Executor
 
         public void Execute()
         {
+            Validate();
+
+            FixFilters();
+
             var @params = BuildParams();
 
-            Processor.FFmpeg(@params);
+            var message = Processor.FFmpeg(@params);
+
+            if(!string.IsNullOrWhiteSpace(message) && -1 == message.IndexOf("kb/s", StringComparison.InvariantCultureIgnoreCase))
+                throw new ApplicationException(message);
         }
 
         private string BuildParams()
         {
-            Validate();
-
-            _source = new MediaStream(_inputPath);
-
-            var outdir = Path.GetDirectoryName(_outputPath);
-
-            if (!string.IsNullOrWhiteSpace(outdir) && !Directory.Exists(outdir))
-            {
-                Directory.CreateDirectory(outdir);
-            }
-
-
-            if (_filters.Any(x => x.Name.Equals("Snapshot", StringComparison.OrdinalIgnoreCase)))
-            {
-                var snapshot = _filters.First(x => x.Name.Equals("Snapshot", StringComparison.OrdinalIgnoreCase));
-                snapshot.Source = _source;
-
-                _filters.Remove(snapshot);
-                
-                Task.Run(() =>
-                {
-                    Processor.FFmpeg(snapshot.ToString());
-                });
-            }
-
             var builder = new StringBuilder();
 
             builder.Append(" -i");
@@ -127,6 +110,46 @@ namespace FFmpegSharp.Executor
             if (string.IsNullOrWhiteSpace(_outputPath))
             {
                 throw new ApplicationException("outout path is null");
+            }
+
+            var outdir = Path.GetDirectoryName(_outputPath);
+
+            if (!string.IsNullOrWhiteSpace(outdir) && !Directory.Exists(outdir))
+            {
+                Directory.CreateDirectory(outdir);
+            }
+        }
+
+        private void FixFilters()
+        {
+            if (_filters.Any(x => x.Name.Equals("Snapshot", StringComparison.OrdinalIgnoreCase)))
+            {
+                var snapshot = _filters.First(x => x.Name.Equals("Snapshot", StringComparison.OrdinalIgnoreCase));
+                snapshot.Source = _source;
+
+                _filters.Remove(snapshot);
+
+                Task.Run(() =>
+                {
+                    Processor.FFmpeg(snapshot.ToString());
+                });
+            }
+
+            if (!_source.AudioInfo.CodecName.Equals("aac", StringComparison.OrdinalIgnoreCase) &&
+                !_filters.Any(x => x.Name.Equals("AudioChannel", StringComparison.OrdinalIgnoreCase)))
+            {
+                _filters.Add(new AudioChannelFilter(2));
+            }
+
+            if (_filters.Any(x => x.Name.Equals("X264", StringComparison.OrdinalIgnoreCase)) &&
+                 !_filters.Any(x => x.Name.Equals("Resize", StringComparison.OrdinalIgnoreCase)))
+            {
+                _filters.Add(new ResizeFilter());
+            }
+
+            if (_code.Name.Equals("flv", StringComparison.OrdinalIgnoreCase))
+            {
+                WithFilter(new AudioRatelFilter(44100));
             }
         }
     }

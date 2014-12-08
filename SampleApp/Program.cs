@@ -21,7 +21,7 @@ namespace SampleApp
             if (string.IsNullOrWhiteSpace(appPath))
                 throw new ApplicationException("app path not found.");
 
-            var inputPath = Path.Combine(appPath, "test.mov");
+            var inputPath = Path.Combine(appPath, "bbt.mkv");
             var outputPath = Path.Combine(appPath, Guid.NewGuid().ToString());
             var image = Path.Combine(appPath, "logo.png");
 
@@ -31,7 +31,7 @@ namespace SampleApp
                 .WidthInput(inputPath)
                 .WithFilter(new X264Filter { Preset = X264Preset.Faster, ConstantQuantizer = 18 })
                 .WithFilter(new ImageWatermarkFilter(image, WatermarkPosition.TopRight))
-                .WithFilter(new ResizeFilter(980, 550))
+                .WithFilter(new ResizeFilter(Resolution.X720P))
                 .WithFilter(new SnapshotFilter(Path.Combine(appPath,"output","output.png"),320,180,10))//with snapshot
                 .To<Mp4>(outputPath)
                 .Execute();

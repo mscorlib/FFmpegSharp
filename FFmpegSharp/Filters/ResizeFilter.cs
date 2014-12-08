@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using FFmpegSharp.Utils;
 
 namespace FFmpegSharp.Filters
@@ -8,40 +9,31 @@ namespace FFmpegSharp.Filters
     /// </summary>
     public class ResizeFilter : FilterBase
     {
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public ResizeType ResizeType { get; private set; }
+        private static readonly Dictionary<Resolution, Size> Sizes = new Dictionary<Resolution, Size>
+        {
+            {Resolution.X240P, new Size(424, 240)},
+            {Resolution.X360P, new Size(640, 360)},
+            {Resolution.X480P, new Size(848, 480)},
+            {Resolution.X720P, new Size(1280, 720)},
+            {Resolution.X1080P, new Size(1920, 1080)},
+        };
+
+        public Resolution Resolution { get; private set; }
 
 
-        public ResizeFilter(int width, int height, ResizeType type = ResizeType.Scale)
+        public ResizeFilter(Resolution resolution = Resolution.X480P)
         {
             Name = "Resize";
             FilterType = FilterType.Video;
-            Width = width;
-            Height = height;
-            ResizeType = type;
+            Resolution = resolution;
 
         }
 
         public override string ToString()
         {
-            int destWidth;
-            int destHeight;
+            var size = Sizes[Resolution];
 
-            if (ResizeType == ResizeType.Scale)
-            {
-                var sourceSize = new Size(Source.VideoInfo.Width, Source.VideoInfo.Height);
-                var destSize = SizeUtils.CalculateOutSize(sourceSize, Width, Height);
-                destWidth = destSize.Width;
-                destHeight = destSize.Height;
-            }
-            else
-            {
-                destWidth = Width;
-                destHeight = Height;
-            }
-
-            return string.Concat(" -s ", destWidth, "x", destHeight);
+            return string.Format(" -s {0}x{1} ", size.Width, size.Height);
         }
     }
 }
